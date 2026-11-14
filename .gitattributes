@@ -1,0 +1,7 @@
+# Tell GitHub Linguist to ignore platform-specific native boilerplate and count Dart
+android/** linguist-vendored
+ios/** linguist-vendored
+linux/** linguist-vendored
+windows/** linguist-vendored
+macos/** linguist-vendored
+web/** linguist-vendored
