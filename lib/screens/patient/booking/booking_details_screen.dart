@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/app_colors.dart';
-import '../../models/doctor.dart';
+import '../../../core/app_colors.dart';
+import '../../../models/doctor.dart';
 import 'booking_payment_screen.dart';
 
 class BookingDetailsScreen extends StatefulWidget {

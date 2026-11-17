@@ -6,8 +6,12 @@ class Appointment {
   final String date;
   final String time;
   final String status; // 'Upcoming', 'Completed', 'Cancelled'
-  final String type;   // 'Teleconsult', 'In-Person', 'Surgical'
+  final String type; // 'Teleconsult', 'In-Person', 'Surgical'
   final String fee;
+  final String? doctorImageUrl;
+  final String? tokenNumber;
+  final bool isLiveNow;
+  final String? cancelReason;
 
   const Appointment({
     required this.id,
@@ -19,5 +23,9 @@ class Appointment {
     required this.status,
     required this.type,
     required this.fee,
+    this.doctorImageUrl,
+    this.tokenNumber,
+    this.isLiveNow = false,
+    this.cancelReason,
   });
 }

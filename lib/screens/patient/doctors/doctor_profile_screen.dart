@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/app_colors.dart';
-import '../../models/doctor.dart';
-import 'appointment_booking_screen.dart';
+import '../../../core/app_colors.dart';
+import '../../../models/doctor.dart';
+import '../booking/appointment_booking_screen.dart';
 
 class DoctorProfileScreen extends StatefulWidget {
   final Doctor doctor;

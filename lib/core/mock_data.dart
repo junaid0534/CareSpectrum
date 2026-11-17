@@ -71,6 +71,10 @@ class MockData {
       status: 'Upcoming',
       type: 'Teleconsult',
       fee: 'PKR 3,000',
+      tokenNumber: '#03',
+      doctorImageUrl:
+          'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&auto=format&fit=crop&q=80',
+      isLiveNow: false,
     ),
     Appointment(
       id: 'apt_2',
@@ -82,6 +86,10 @@ class MockData {
       status: 'Upcoming',
       type: 'In-Person',
       fee: 'PKR 3,500',
+      tokenNumber: '#08',
+      doctorImageUrl:
+          'https://images.unsplash.com/photo-1594824813627-c10fa8892ec5?w=400&auto=format&fit=crop&q=80',
+      isLiveNow: false,
     ),
     Appointment(
       id: 'apt_3',
@@ -91,8 +99,11 @@ class MockData {
       date: '02 Nov, 2026',
       time: '02:00 PM',
       status: 'Completed',
-      type: 'Surgical',
+      type: 'In-Person',
       fee: 'PKR 2,500',
+      tokenNumber: '#02',
+      doctorImageUrl:
+          'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=400&auto=format&fit=crop&q=80',
     ),
     Appointment(
       id: 'apt_4',
@@ -104,6 +115,10 @@ class MockData {
       status: 'Cancelled',
       type: 'Teleconsult',
       fee: 'PKR 2,000',
+      tokenNumber: '#05',
+      doctorImageUrl:
+          'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop&q=80',
+      cancelReason: 'Doctor emergency surgery duty',
     ),
   ];
 

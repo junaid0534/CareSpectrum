@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../core/app_colors.dart';
-import 'patient_home.dart';
-import 'patient_appointments.dart';
-import 'patient_doctors.dart';
-import 'patient_profile.dart';
+import 'home/patient_home.dart';
+import 'appointments/patient_appointments.dart';
+import 'doctors/patient_doctors.dart';
+import 'records/medical_records_hub_screen.dart';
+import 'profile/patient_profile.dart';
+import 'ai_assistant/ai_assistant_screen.dart';
 import '../login_screen.dart';
 
 class PatientShell extends StatefulWidget {
@@ -43,6 +45,7 @@ class _PatientShellState extends State<PatientShell> {
       ),
       const PatientAppointmentsScreen(),
       const PatientDoctorsScreen(),
+      const MedicalRecordsHubScreen(showBackButton: false),
       const PatientProfileScreen(),
     ];
 
@@ -56,6 +59,10 @@ class _PatientShellState extends State<PatientShell> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(22),
+            topRight: Radius.circular(22),
+          ),
           border: Border(
             top: BorderSide(
               color: AppColors.border.withValues(alpha: 0.8),
@@ -64,50 +71,51 @@ class _PatientShellState extends State<PatientShell> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 16,
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 18,
               offset: const Offset(0, -4),
+            ),
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.02),
+              blurRadius: 8,
+              offset: const Offset(0, -1),
             ),
           ],
         ),
         child: SafeArea(
+          top: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: _onTabTapped,
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              selectedItemColor: AppColors.primary,
-              unselectedItemColor: AppColors.textMuted,
-              selectedLabelStyle: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-              ),
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home_outlined),
-                  activeIcon: Icon(Icons.home_rounded),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+            child: Row(
+              children: [
+                _buildBottomNavItem(
+                  index: 0,
+                  icon: Icons.home_outlined,
+                  activeIcon: Icons.home_rounded,
                   label: 'Home',
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.calendar_today_outlined),
-                  activeIcon: Icon(Icons.calendar_month_rounded),
+                _buildBottomNavItem(
+                  index: 1,
+                  icon: Icons.calendar_today_outlined,
+                  activeIcon: Icons.calendar_month_rounded,
                   label: 'Appointments',
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.people_outline_rounded),
-                  activeIcon: Icon(Icons.people_rounded),
+                _buildBottomNavItem(
+                  index: 2,
+                  icon: Icons.people_outline_rounded,
+                  activeIcon: Icons.people_rounded,
                   label: 'Doctors',
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person_outline_rounded),
-                  activeIcon: Icon(Icons.person_rounded),
+                _buildBottomNavItem(
+                  index: 3,
+                  icon: Icons.folder_shared_outlined,
+                  activeIcon: Icons.folder_shared_rounded,
+                  label: 'Records',
+                ),
+                _buildBottomNavItem(
+                  index: 4,
+                  icon: Icons.person_outline_rounded,
+                  activeIcon: Icons.person_rounded,
                   label: 'Profile',
                 ),
               ],
@@ -115,16 +123,111 @@ class _PatientShellState extends State<PatientShell> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAiAssistantBottomSheet(context);
-        },
-        backgroundColor: AppColors.primaryDark,
-        elevation: 4,
-        child: const Icon(
-          Icons.smart_toy_outlined,
-          color: Colors.white,
-          size: 26,
+      floatingActionButton: Container(
+        height: 50,
+        width: 50,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0284C7), Color(0xFF0369A1)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0284C7).withValues(alpha: 0.35),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AiAssistantScreen(),
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: const Center(
+              child: Icon(
+                Icons.smart_toy_outlined,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavItem({
+    required int index,
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+  }) {
+    final isSelected = _currentIndex == index;
+
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _onTabTapped(index),
+          splashColor: AppColors.primary.withValues(alpha: 0.08),
+          highlightColor: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isSelected ? 16 : 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? const Color(0xFFEFF6FF)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    isSelected ? activeIcon : icon,
+                    size: 21,
+                    color: isSelected
+                        ? AppColors.primary
+                        : const Color(0xFF94A3B8),
+                  ),
+                ),
+                const SizedBox(height: 3),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 200),
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected
+                          ? AppColors.primary
+                          : const Color(0xFF64748B),
+                      letterSpacing: isSelected ? -0.1 : 0,
+                    ),
+                    child: Text(label),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -218,12 +321,21 @@ class _PatientShellState extends State<PatientShell> {
                   },
                 ),
                 _buildDrawerTile(
-                  icon: Icons.person_rounded,
-                  title: 'Health Profile',
+                  icon: Icons.folder_shared_rounded,
+                  title: 'Medical Records',
                   isSelected: _currentIndex == 3,
                   onTap: () {
                     Navigator.pop(context);
                     _onTabTapped(3);
+                  },
+                ),
+                _buildDrawerTile(
+                  icon: Icons.person_rounded,
+                  title: 'Health Profile',
+                  isSelected: _currentIndex == 4,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _onTabTapped(4);
                   },
                 ),
                 const Divider(height: 20, color: AppColors.border),
@@ -315,115 +427,6 @@ class _PatientShellState extends State<PatientShell> {
             ),
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      ),
-    );
-  }
-
-  void _showAiAssistantBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (sheetContext) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.smart_toy_outlined,
-                    color: AppColors.primary,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'AI Health & Surgical Assistant',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    Text(
-                      'Ask about symptoms, prep notes or recovery',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'How can CareSpectrum AI assist your health journey today?',
-              style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
-            ),
-            const SizedBox(height: 14),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _buildPromptChip(sheetContext, 'Check My Symptoms'),
-                _buildPromptChip(sheetContext, 'Pre-Surgery Fasting Guide'),
-                _buildPromptChip(sheetContext, 'Book Teleconsultation'),
-              ],
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(sheetContext),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 44),
-              ),
-              child: const Text('Start AI Consultation'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPromptChip(BuildContext context, String text) {
-    return InkWell(
-      onTap: () {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Prompt: "$text"'),
-            backgroundColor: AppColors.primary,
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          ),
         ),
       ),
     );

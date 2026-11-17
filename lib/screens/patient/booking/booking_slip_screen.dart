@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/app_colors.dart';
-import '../../models/doctor.dart';
+import '../../../core/app_colors.dart';
+import '../../../models/doctor.dart';
 
 class BookingSlipScreen extends StatelessWidget {
   final Doctor doctor;

@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../core/app_colors.dart';
-import '../../core/mock_data.dart';
-import '../../models/doctor.dart';
-import '../../models/appointment.dart';
-import 'doctor_profile_screen.dart';
+import '../../../core/app_colors.dart';
+import '../../../core/mock_data.dart';
+import '../../../models/doctor.dart';
+import '../../../models/appointment.dart';
+import '../doctors/doctor_profile_screen.dart';
+import '../notifications/notifications_screen.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   final Function(int) onTabChange;
@@ -293,17 +294,13 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             ),
           ),
 
-          // Right: Notification Bell with Badge (Moved up & vertically aligned)
+          // Right: Notification Bell with Badge (Navigates to Notifications Center)
           InkWell(
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('You have 2 unread health notifications.'),
-                  backgroundColor: AppColors.primary,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const NotificationsScreen(),
                 ),
               );
             },
@@ -1161,10 +1158,10 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'My Health Vitals',
               style: TextStyle(
                 fontSize: 16,
@@ -1172,12 +1169,15 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 color: AppColors.textPrimary,
               ),
             ),
-            Text(
-              'Updated Today',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
+            InkWell(
+              onTap: () => widget.onTabChange(3), // Switch to Records tab
+              child: const Text(
+                'View All',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
               ),
             ),
           ],
@@ -1186,56 +1186,60 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         Row(
           children: vitals.map((v) {
             return Expanded(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(v['icon'] as IconData, size: 18, color: v['color'] as Color),
-                    const SizedBox(height: 8),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            v['value'] as String,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
+              child: InkWell(
+                onTap: () => widget.onTabChange(3), // Switch to Records tab
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(v['icon'] as IconData, size: 18, color: v['color'] as Color),
+                      const SizedBox(height: 8),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              v['value'] as String,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            v['unit'] as String,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: AppColors.textMuted,
+                            const SizedBox(width: 3),
+                            Text(
+                              v['unit'] as String,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: AppColors.textMuted,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      v['title'] as String,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
+                      const SizedBox(height: 2),
+                      Text(
+                        v['title'] as String,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
