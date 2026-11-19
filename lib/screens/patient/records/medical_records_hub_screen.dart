@@ -5,6 +5,7 @@ import 'category_records_screen.dart';
 import '../surgical/wound_scanner_screen.dart';
 import '../surgical/live_ot_tracker_screen.dart';
 import '../surgical/preop_readiness_screen.dart';
+import '../medication/medication_reminder_screen.dart';
 
 class MedicalRecordsHubScreen extends StatefulWidget {
   final bool? showBackButton;
@@ -773,59 +774,40 @@ class _MedicalRecordsHubScreenState extends State<MedicalRecordsHubScreen> {
             ),
             const SizedBox(height: 12),
 
-            // 3. 2 by 2 Category Menu with Big Clear Icons & Name Underneath
+            // 3. 4 in 1 Single Row Categories (Direct on screen, no bulky card)
             Row(
               children: [
-                // Prescriptions
-                Expanded(
-                  child: _buildBigIconCategoryCard(
-                    title: 'Prescriptions',
-                    categoryKey: 'Prescriptions',
-                    countText: '$prescriptionCount Files',
-                    icon: Icons.medication_outlined,
-                    iconColor: const Color(0xFF0284C7),
-                    iconBgColor: const Color(0xFFEFF6FF),
-                  ),
+                _buildSimpleCategoryItem(
+                  title: 'Prescriptions',
+                  categoryKey: 'Prescriptions',
+                  countText: '$prescriptionCount',
+                  icon: Icons.medication_outlined,
+                  iconColor: const Color(0xFF0284C7),
+                  iconBgColor: const Color(0xFFEFF6FF),
                 ),
-                const SizedBox(width: 14),
-                // Lab Reports
-                Expanded(
-                  child: _buildBigIconCategoryCard(
-                    title: 'Lab Reports',
-                    categoryKey: 'Lab Reports',
-                    countText: '$labCount Files',
-                    icon: Icons.science_outlined,
-                    iconColor: const Color(0xFF059669),
-                    iconBgColor: const Color(0xFFECFDF5),
-                  ),
+                _buildSimpleCategoryItem(
+                  title: 'Lab Reports',
+                  categoryKey: 'Lab Reports',
+                  countText: '$labCount',
+                  icon: Icons.science_outlined,
+                  iconColor: const Color(0xFF059669),
+                  iconBgColor: const Color(0xFFECFDF5),
                 ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                // Surgical Records
-                Expanded(
-                  child: _buildBigIconCategoryCard(
-                    title: 'Surgical Records',
-                    categoryKey: 'Surgical',
-                    countText: '$surgicalCount Files',
-                    icon: Icons.medical_services_outlined,
-                    iconColor: const Color(0xFFD97706),
-                    iconBgColor: const Color(0xFFFFFBEB),
-                  ),
+                _buildSimpleCategoryItem(
+                  title: 'Surgical',
+                  categoryKey: 'Surgical',
+                  countText: '$surgicalCount',
+                  icon: Icons.medical_services_outlined,
+                  iconColor: const Color(0xFFD97706),
+                  iconBgColor: const Color(0xFFFFFBEB),
                 ),
-                const SizedBox(width: 14),
-                // Vitals & Logs
-                Expanded(
-                  child: _buildBigIconCategoryCard(
-                    title: 'Vitals & Logs',
-                    categoryKey: 'Vitals',
-                    countText: '$vitalsCount Files',
-                    icon: Icons.monitor_heart_outlined,
-                    iconColor: const Color(0xFFE11D48),
-                    iconBgColor: const Color(0xFFFFF1F2),
-                  ),
+                _buildSimpleCategoryItem(
+                  title: 'Vitals',
+                  categoryKey: 'Vitals',
+                  countText: '$vitalsCount',
+                  icon: Icons.monitor_heart_outlined,
+                  iconColor: const Color(0xFFE11D48),
+                  iconBgColor: const Color(0xFFFFF1F2),
                 ),
               ],
             ),
@@ -1034,6 +1016,74 @@ class _MedicalRecordsHubScreenState extends State<MedicalRecordsHubScreen> {
               ),
             ),
 
+            const SizedBox(height: 10),
+
+            // 3.8 Daily Medication & Pill Reminder Shortcut
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MedicationReminderScreen(),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFAF5FF),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE9D5FF)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF9333EA),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.alarm_on_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Daily Medication Reminder',
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF6B21A8),
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Track daily doses, meal timings & pill stock',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF7E22CE),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 13,
+                      color: Color(0xFF9333EA),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
             const SizedBox(height: 14),
 
             // 4. Quick Action Button (Clean and uncluttered; no records on this screen)
@@ -1056,8 +1106,8 @@ class _MedicalRecordsHubScreenState extends State<MedicalRecordsHubScreen> {
     );
   }
 
-  // 2x2 Category Card with Big, Prominent Icon and Name Underneath
-  Widget _buildBigIconCategoryCard({
+  // 4 in 1 Simple Category Item (Direct on screen, no card box)
+  Widget _buildSimpleCategoryItem({
     required String title,
     required String categoryKey,
     required String countText,
@@ -1065,78 +1115,61 @@ class _MedicalRecordsHubScreenState extends State<MedicalRecordsHubScreen> {
     required Color iconColor,
     required Color iconBgColor,
   }) {
-    return InkWell(
-      onTap: () => _navigateToCategory(
-        title: title,
-        categoryKey: categoryKey,
-        icon: icon,
-        color: iconColor,
-      ),
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 12),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+    return Expanded(
+      child: InkWell(
+        onTap: () => _navigateToCategory(
+          title: title,
+          categoryKey: categoryKey,
+          icon: icon,
+          color: iconColor,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Big Clear Icon Container
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: iconBgColor,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: iconColor,
-                size: 32,
-              ),
-            ),
-            const SizedBox(height: 14),
-
-            // Category Name Underneath
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14.5,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-
-            // Clean Count Pill
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: iconBgColor,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                countText,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: iconColor.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  icon,
                   color: iconColor,
+                  size: 24,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 6),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '$countText Files',
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w600,
+                  color: iconColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );

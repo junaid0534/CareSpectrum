@@ -12,6 +12,7 @@ class PreOpReadinessScreen extends StatefulWidget {
 class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
   late Timer _countdownTimer;
   int _remainingSeconds = 20538; // 5 hours 42 mins 18 secs
+  bool _simulateViolation = false; // Interactive FYP AI Risk simulation toggle
 
   @override
   void initState() {
@@ -99,6 +100,210 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
     );
   }
 
+  void _showAiAuditSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setSheetState) => Container(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.auto_awesome_rounded, size: 18, color: AppColors.primary),
+                      SizedBox(width: 8),
+                      Text(
+                        'AI Surgical Risk Engine',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'NSQIP / ASA-PS',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              // Vectors
+              _buildAuditVector(
+                title: 'Pulmonary Aspiration Risk',
+                desc: _simulateViolation ? 'CRITICAL: Solid food intake within 6h' : 'Minimal (<0.1%): 8h solid food buffer maintained',
+                isSafe: !_simulateViolation,
+              ),
+              _buildAuditVector(
+                title: 'Hemostasis & Bleeding',
+                desc: 'Safe: Disprin paused 5d (Platelets normal, PT/INR 1.05)',
+                isSafe: true,
+              ),
+              _buildAuditVector(
+                title: 'Cardiopulmonary Clearance',
+                desc: 'Cleared: 12-lead ECG normal sinus rhythm',
+                isSafe: true,
+              ),
+
+              const SizedBox(height: 14),
+              const Divider(height: 1, color: AppColors.border),
+              const SizedBox(height: 12),
+
+              // Interactive Simulation Toggle
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _simulateViolation ? const Color(0xFFFCA5A5) : AppColors.border,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'FYP Defense Simulation',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _simulateViolation
+                              ? 'Simulating: Patient ate food (Violation active)'
+                              : 'Test AI reaction if patient breaks fasting',
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              color: _simulateViolation ? const Color(0xFFDC2626) : AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch.adaptive(
+                      value: _simulateViolation,
+                      activeTrackColor: const Color(0xFFEF4444),
+                      onChanged: (val) {
+                        setSheetState(() {
+                          _simulateViolation = val;
+                        });
+                        setState(() {
+                          _simulateViolation = val;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 40),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text('Close Audit'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAuditVector({
+    required String title,
+    required String desc,
+    required bool isSafe,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isSafe ? Icons.check_circle_rounded : Icons.warning_rounded,
+            size: 15,
+            color: isSafe ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                Text(
+                  desc,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: isSafe ? AppColors.textSecondary : const Color(0xFFDC2626),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFaqItem(String title, String subtitle) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -149,6 +354,9 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
     final hours = (_remainingSeconds ~/ 3600).toString().padLeft(2, '0');
     final minutes = ((_remainingSeconds % 3600) ~/ 60).toString().padLeft(2, '0');
     final seconds = (_remainingSeconds % 60).toString().padLeft(2, '0');
+
+    final readinessScore = _simulateViolation ? 34 : 96;
+    final isSafe = !_simulateViolation;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -212,7 +420,7 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -243,15 +451,22 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
 
-            // 2. Minimalist Fasting Hero Card
+            // 2. AI Pre-Op Readiness & Risk Predictor Module
+            _buildAiReadinessCard(readinessScore, isSafe),
+
+            const SizedBox(height: 10),
+
+            // 3. Minimalist Fasting Hero Card
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(
+                  color: isSafe ? AppColors.border : const Color(0xFFFCA5A5),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.02),
@@ -269,20 +484,24 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFEF3C7),
+                          color: isSafe ? const Color(0xFFFEF3C7) : const Color(0xFFFEE2E2),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.circle, size: 6, color: Color(0xFFD97706)),
-                            SizedBox(width: 5),
+                            Icon(
+                              Icons.circle,
+                              size: 6,
+                              color: isSafe ? const Color(0xFFD97706) : const Color(0xFFDC2626),
+                            ),
+                            const SizedBox(width: 5),
                             Text(
-                              'FASTING ACTIVE',
+                              isSafe ? 'FASTING ACTIVE' : 'FASTING VIOLATED',
                               style: TextStyle(
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFFB45309),
+                                color: isSafe ? const Color(0xFFB45309) : const Color(0xFF991B1B),
                               ),
                             ),
                           ],
@@ -302,7 +521,7 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
 
                   // Digital Clock Block
                   Row(
@@ -346,9 +565,9 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 14),
-                  const Divider(height: 1, color: AppColors.border),
                   const SizedBox(height: 12),
+                  const Divider(height: 1, color: AppColors.border),
+                  const SizedBox(height: 10),
 
                   // 2 Minimal Rule Columns
                   Row(
@@ -361,7 +580,7 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
                           color: const Color(0xFFEF4444),
                         ),
                       ),
-                      Container(width: 1, height: 32, color: AppColors.border),
+                      Container(width: 1, height: 30, color: AppColors.border),
                       Expanded(
                         child: _buildMinimalRule(
                           icon: Icons.water_drop_outlined,
@@ -376,9 +595,9 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
 
-            // 3. Safety Clearance Row (Medication & Consent)
+            // 4. Safety Clearance Row (Medication & Consent)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
@@ -403,9 +622,9 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
               ),
             ),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
 
-            // 4. Clinical Fitness (4 Minimalist Pills)
+            // 5. Clinical Fitness (4 Minimalist Pills)
             const Text(
               'CLINICAL CLEARANCES',
               style: TextStyle(
@@ -415,13 +634,13 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
                 color: AppColors.textMuted,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
 
             _buildClearanceRow(),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
-            // 5. Minimal Action Button
+            // 6. Action Button
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -429,8 +648,10 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
                 icon: const Icon(Icons.phone_in_talk_rounded, size: 15),
                 label: const Text('Call Anesthesia Desk'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary),
+                  foregroundColor: isSafe ? AppColors.primary : const Color(0xFFDC2626),
+                  side: BorderSide(
+                    color: isSafe ? AppColors.primary : const Color(0xFFDC2626),
+                  ),
                   minimumSize: const Size(0, 42),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -441,6 +662,120 @@ class _PreOpReadinessScreenState extends State<PreOpReadinessScreen> {
                   ),
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAiReadinessCard(int score, bool isSafe) {
+    return InkWell(
+      onTap: _showAiAuditSheet,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSafe ? const Color(0xFFF0FDF4) : const Color(0xFFFEF2F2),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSafe ? const Color(0xFFBBF7D0) : const Color(0xFFFECACA),
+          ),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.auto_awesome_rounded,
+                      size: 15,
+                      color: isSafe ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                    ),
+                    const SizedBox(width: 6),
+                    const Text(
+                      'AI SURGICAL READINESS',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: isSafe ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    isSafe ? 'ASA-I • READY' : 'HIGH RISK • DELAY',
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      color: isSafe ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Text(
+                  '$score%',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    color: isSafe ? const Color(0xFF15803D) : const Color(0xFFDC2626),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: score / 100,
+                          minHeight: 6,
+                          backgroundColor: Colors.black.withValues(alpha: 0.06),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            isSafe ? const Color(0xFF16A34A) : const Color(0xFFEF4444),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            isSafe ? 'Optimal for General Anesthesia' : 'Aspiration Hazard Detected',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: isSafe ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                            ),
+                          ),
+                          const Text(
+                            'Audit Details ➔',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -6,6 +6,7 @@ import '../../../models/doctor.dart';
 import '../booking/appointment_booking_screen.dart';
 import '../booking/booking_slip_screen.dart';
 import '../doctors/doctor_profile_screen.dart';
+import 'doctor_review_screen.dart';
 
 class PatientAppointmentsScreen extends StatefulWidget {
   const PatientAppointmentsScreen({super.key});
@@ -80,6 +81,44 @@ class _PatientAppointmentsScreenState extends State<PatientAppointmentsScreen>
         ),
       ),
     );
+  }
+
+  Future<void> _openReviewScreen(Appointment appt) async {
+    final updatedAppt = await Navigator.push<Appointment>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DoctorReviewScreen(appointment: appt),
+      ),
+    );
+
+    if (updatedAppt != null) {
+      setState(() {
+        final idx = _appointmentList.indexWhere((a) => a.id == updatedAppt.id);
+        if (idx != -1) {
+          _appointmentList[idx] = updatedAppt;
+        }
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded,
+                  color: Colors.white, size: 16),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Verified review published for ${updatedAppt.doctorName}!',
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: const Color(0xFF059669),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   void _showDoctorCallNotice(Appointment appt) {
@@ -996,19 +1035,41 @@ class _PatientAppointmentsScreenState extends State<PatientAppointmentsScreen>
             if (isUpcoming)
               Row(
                 children: [
+                  // Direct Cancel Button
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showCancelDialog(appt),
+                      icon: const Icon(Icons.close_rounded, size: 13),
+                      label: const Text('Cancel'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFFDC2626),
+                        side: const BorderSide(color: Color(0xFFFCA5A5)),
+                        minimumSize: const Size(0, 32),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // E-Slip Button
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () => _openAppointmentSlip(appt),
-                      icon: const Icon(Icons.receipt_long_rounded, size: 16),
+                      icon: const Icon(Icons.receipt_long_rounded, size: 13),
                       label: const Text('View E-Slip'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 38),
+                        minimumSize: const Size(0, 32),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         elevation: 0,
+                        textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
@@ -1025,35 +1086,110 @@ class _PatientAppointmentsScreenState extends State<PatientAppointmentsScreen>
                             ),
                           );
                         },
-                        icon: const Icon(Icons.videocam_rounded, size: 16),
+                        icon: const Icon(Icons.videocam_rounded, size: 14),
                         label: const Text('Join Now'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF10B981),
                           foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 38),
+                          minimumSize: const Size(0, 32),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           elevation: 0,
+                          textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
                         ),
                       ),
                     ),
                   ],
                 ],
               )
-            else if (isCompleted)
+            else if (isCompleted) ...[
+              if (appt.hasReviewed) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFBEB),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFFDE68A)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.star_rounded, size: 15, color: Color(0xFFF59E0B)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${appt.patientRating!.toStringAsFixed(1)} ★ Rated',
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFFB45309),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Text(
+                        '• Verified Review',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFD97706),
+                        ),
+                      ),
+                      const Spacer(),
+                      InkWell(
+                        onTap: () => _openReviewScreen(appt),
+                        child: const Text(
+                          'Edit Review',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 6),
+              ] else ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _openReviewScreen(appt),
+                    icon: const Icon(Icons.star_rounded, size: 14, color: Color(0xFFF59E0B)),
+                    label: const Text('Rate Consultation (Verified)'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFFFBEB),
+                      foregroundColor: const Color(0xFFB45309),
+                      side: const BorderSide(color: Color(0xFFFDE68A)),
+                      minimumSize: const Size(double.infinity, 30),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                      textStyle: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+              ],
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _openAppointmentSlip(appt),
-                      icon: const Icon(Icons.receipt_long_rounded, size: 15),
-                      label: const Text('View Slip & Summary'),
+                      icon: const Icon(Icons.receipt_long_rounded, size: 13),
+                      label: const Text('View Slip'),
                       style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 38),
+                        minimumSize: const Size(0, 32),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                         ),
+                        textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
@@ -1072,17 +1208,20 @@ class _PatientAppointmentsScreenState extends State<PatientAppointmentsScreen>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 38),
+                        minimumSize: const Size(0, 32),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         elevation: 0,
+                        textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
                       ),
                       child: const Text('Book Follow-up'),
                     ),
                   ),
                 ],
-              )
+              ),
+            ]
             else
               SizedBox(
                 width: double.infinity,
@@ -1096,13 +1235,15 @@ class _PatientAppointmentsScreenState extends State<PatientAppointmentsScreen>
                       ),
                     );
                   },
-                  icon: const Icon(Icons.refresh_rounded, size: 16),
+                  icon: const Icon(Icons.refresh_rounded, size: 14),
                   label: const Text('Re-Book Appointment'),
                   style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 38),
+                    minimumSize: const Size(0, 32),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),

@@ -6,6 +6,8 @@ import 'doctors/patient_doctors.dart';
 import 'records/medical_records_hub_screen.dart';
 import 'profile/patient_profile.dart';
 import 'ai_assistant/ai_assistant_screen.dart';
+import 'medication/medication_reminder_screen.dart';
+import 'surgical/wound_scanner_screen.dart';
 import '../login_screen.dart';
 
 class PatientShell extends StatefulWidget {
@@ -338,7 +340,36 @@ class _PatientShellState extends State<PatientShell> {
                     _onTabTapped(4);
                   },
                 ),
-                const Divider(height: 20, color: AppColors.border),
+                const Divider(height: 18, color: AppColors.border),
+                _buildDrawerTile(
+                  icon: Icons.alarm_on_rounded,
+                  title: 'Medication Reminder',
+                  iconColor: const Color(0xFF9333EA),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MedicationReminderScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildDrawerTile(
+                  icon: Icons.camera_enhance_rounded,
+                  title: 'AI Wound Scanner',
+                  iconColor: const Color(0xFF10B981),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const WoundScannerScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 18, color: AppColors.border),
                 _buildDrawerTile(
                   icon: Icons.emergency_rounded,
                   title: 'Emergency SOS',

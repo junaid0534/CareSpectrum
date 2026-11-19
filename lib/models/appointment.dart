@@ -12,6 +12,9 @@ class Appointment {
   final String? tokenNumber;
   final bool isLiveNow;
   final String? cancelReason;
+  final double? patientRating;
+  final String? patientReview;
+  final String? reviewDate;
 
   const Appointment({
     required this.id,
@@ -27,5 +30,48 @@ class Appointment {
     this.tokenNumber,
     this.isLiveNow = false,
     this.cancelReason,
+    this.patientRating,
+    this.patientReview,
+    this.reviewDate,
   });
+
+  bool get hasReviewed => patientRating != null && patientRating! > 0;
+
+  Appointment copyWith({
+    String? id,
+    String? doctorName,
+    String? specialty,
+    String? hospital,
+    String? date,
+    String? time,
+    String? status,
+    String? type,
+    String? fee,
+    String? doctorImageUrl,
+    String? tokenNumber,
+    bool? isLiveNow,
+    String? cancelReason,
+    double? patientRating,
+    String? patientReview,
+    String? reviewDate,
+  }) {
+    return Appointment(
+      id: id ?? this.id,
+      doctorName: doctorName ?? this.doctorName,
+      specialty: specialty ?? this.specialty,
+      hospital: hospital ?? this.hospital,
+      date: date ?? this.date,
+      time: time ?? this.time,
+      status: status ?? this.status,
+      type: type ?? this.type,
+      fee: fee ?? this.fee,
+      doctorImageUrl: doctorImageUrl ?? this.doctorImageUrl,
+      tokenNumber: tokenNumber ?? this.tokenNumber,
+      isLiveNow: isLiveNow ?? this.isLiveNow,
+      cancelReason: cancelReason ?? this.cancelReason,
+      patientRating: patientRating ?? this.patientRating,
+      patientReview: patientReview ?? this.patientReview,
+      reviewDate: reviewDate ?? this.reviewDate,
+    );
+  }
 }
