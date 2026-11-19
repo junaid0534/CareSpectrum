@@ -8,6 +8,7 @@ import 'profile/patient_profile.dart';
 import 'ai_assistant/ai_assistant_screen.dart';
 import 'medication/medication_reminder_screen.dart';
 import 'surgical/wound_scanner_screen.dart';
+import '../doctor/doctor_shell.dart';
 import '../login_screen.dart';
 
 class PatientShell extends StatefulWidget {
@@ -389,6 +390,20 @@ class _PatientShellState extends State<PatientShell> {
                   title: 'Help & Support',
                   onTap: () {
                     Navigator.pop(context);
+                  },
+                ),
+                _buildDrawerTile(
+                  icon: Icons.swap_horiz_rounded,
+                  title: 'Switch to Doctor Portal',
+                  iconColor: const Color(0xFF0284C7),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const DoctorShell(),
+                      ),
+                    );
                   },
                 ),
               ],
